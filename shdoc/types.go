@@ -32,7 +32,7 @@ func (d *Document) AllFunctions() []FuncDoc {
 type FuncDoc struct {
 	Name        string        `json:"name"                        desc:"Function name as it appears in the source"`
 	Description string        `json:"description,omitempty"       desc:"Description of the function (@description)"`
-	Example     string        `json:"example,omitempty"           desc:"Example usage (@example)"`
+	Examples    []string      `json:"examples,omitempty"          desc:"Example usages (@example)"`
 	Options     []OptionEntry `json:"options,omitempty"           desc:"Command-line options the function accepts (@option)"`
 	BadOptions  []string      `json:"-"`
 	Args        []Arg         `json:"args,omitempty"              desc:"Positional arguments the function accepts (@arg)"`
@@ -60,7 +60,7 @@ func (f *FuncDoc) hasDocumentation() bool {
 		len(f.Stdin) > 0 || len(f.Stdout) > 0 ||
 		len(f.Stderr) > 0 || len(f.See) > 0 ||
 		len(f.Labels) > 0 || len(f.Warnings) > 0 ||
-		f.IsDeprecated || f.Example != ""
+		f.IsDeprecated || len(f.Examples) > 0
 }
 
 // OptionForm represents one form of a command-line option (e.g., "-n" or "--repeat").

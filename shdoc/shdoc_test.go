@@ -309,6 +309,12 @@ farewell() {
 	if len(f.See) != 1 {
 		t.Errorf("Expected 1 see, got %d", len(f.See))
 	}
+	if len(f.Examples) != 1 {
+		t.Fatalf("Expected 1 example, got %d", len(f.Examples))
+	}
+	if f.Examples[0] != "   greet \"World\"" {
+		t.Errorf("Unexpected example: %q", f.Examples[0])
+	}
 
 	// Check second function
 	f2 := allFuncs[1]
@@ -317,6 +323,34 @@ farewell() {
 	}
 	if !f2.IsNoArgs {
 		t.Errorf("Expected IsNoArgs to be true")
+	}
+}
+
+func TestMultipleExampleTags(t *testing.T) {
+	src := `# @description Greet someone.
+# @example
+#   greet "World"
+# @example
+#   greet "Mars"
+greet() {
+    echo "Hello, $1!"
+}`
+
+	doc, _ := ParseDocument(src)
+	all := doc.AllFunctions()
+	if len(all) != 1 {
+		t.Fatalf("Expected 1 function, got %d", len(all))
+	}
+
+	examples := all[0].Examples
+	if len(examples) != 2 {
+		t.Fatalf("Expected 2 examples, got %d", len(examples))
+	}
+	if examples[0] != "   greet \"World\"" {
+		t.Errorf("examples[0] = %q, want %q", examples[0], "   greet \"World\"")
+	}
+	if examples[1] != "   greet \"Mars\"" {
+		t.Errorf("examples[1] = %q, want %q", examples[1], "   greet \"Mars\"")
 	}
 }
 

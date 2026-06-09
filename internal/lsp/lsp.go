@@ -73,13 +73,14 @@ const hoverTemplate = `{{- range .Sections}}{{range .Functions -}}
 {{range $i, $w := .Warnings}}{{if $i}}
 {{end}}* {{$w}}{{end}}
 {{- end}}
-{{- if .Example}}
+{{- if .Examples}}{{range .Examples}}
 
 #### Example
 
 ` + "```bash" + `
-{{unindent .Example}}
+{{unindent .}}
 ` + "```" + `
+{{end}}
 {{- end}}
 {{- if or .Options .BadOptions}}
 

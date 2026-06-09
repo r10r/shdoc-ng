@@ -534,9 +534,11 @@ func (bp *blockParser) parseFuncBlock(block ParsedBlock) {
 			for _, l := range cont {
 				exParts = append(exParts, stripExample(l.Raw))
 			}
-			docblock.Example = strings.Join(exParts, "\n")
-			if strings.TrimSpace(docblock.Example) == "" {
+			example := strings.Join(exParts, "\n")
+			if strings.TrimSpace(example) == "" {
 				bp.warn(lineNum, tagCol(raw), "Empty value: @example requires content on following lines")
+			} else {
+				docblock.Examples = append(docblock.Examples, example)
 			}
 
 		case "option":

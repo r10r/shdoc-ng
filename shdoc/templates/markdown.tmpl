@@ -28,7 +28,7 @@ FuncDoc fields (passed to funcBlock and all sec* templates):
   .DeprecatedMessage string       — @deprecated message, may be empty
   .Description string        — @description block
   .Warnings    []string      — @warning values
-  .Example     string        — @example block (raw, use unindent to strip indent)
+  .Examples    []string      — @example blocks (raw, use unindent to strip indent)
   .Options     []OptionEntry — @option entries that passed validation
   .BadOptions  []string      — @option entries that failed validation (raw text)
   .Args        []ArgEntry    — @arg entries
@@ -90,7 +90,7 @@ Content never ends with a trailing newline; funcBlock appends a final "\n".
 
 {{- /* secExample — @example fenced code block */ -}}
 {{- define "secExample" -}}
-{{- if .Example}}{{"\n\n#### Example\n\n```bash\n"}}{{unindent .Example}}{{"\n```"}}{{- end -}}
+{{- if .Examples}}{{range $i, $example := .Examples}}{{"\n\n#### Example\n\n```bash\n"}}{{unindent $example}}{{"\n```"}}{{end}}{{- end -}}
 {{- end -}}
 
 {{- /*

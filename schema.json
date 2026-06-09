@@ -102,9 +102,12 @@
                   },
                   "type": "array"
                 },
-                "example": {
-                  "description": "Example usage (@example)",
-                  "type": "string"
+                "examples": {
+                  "description": "Example usages (@example)",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 },
                 "exitcodes": {
                   "description": "Exit codes and their meanings (@exitcode)",
