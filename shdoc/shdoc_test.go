@@ -354,6 +354,28 @@ greet() {
 	}
 }
 
+func TestExampleTagAcceptsTabIndentedContinuation(t *testing.T) {
+	src := "# @description Greet someone.\n# @example\n#\tgreet \"World\"\ngreet() {\n    echo \"Hello, $1!\"\n}"
+
+	doc, warns := ParseDocument(src)
+	if len(warns) != 0 {
+		t.Fatalf("Expected no warnings, got %v", warns)
+	}
+
+	all := doc.AllFunctions()
+	if len(all) != 1 {
+		t.Fatalf("Expected 1 function, got %d", len(all))
+	}
+
+	examples := all[0].Examples
+	if len(examples) != 1 {
+		t.Fatalf("Expected 1 example, got %d", len(examples))
+	}
+	if examples[0] != "\tgreet \"World\"" {
+		t.Errorf("examples[0] = %q, want %q", examples[0], "\tgreet \"World\"")
+	}
+}
+
 func TestArgOnlyFunctionKeepsArgs(t *testing.T) {
 	src := `# @arg $1 string A name to greet.
 # @arg $2 int How many times.

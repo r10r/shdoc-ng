@@ -44,8 +44,8 @@ var (
 	// Parses @exitcode: code description
 	bpExitCodeRe = regexp.MustCompile(`^([>!]?[0-9]{1,3}) (.*)$`)
 
-	// Matches a valid @example continuation line: any comment with >= 1 space after #.
-	bpExampleContRe = regexp.MustCompile(`^[\s]*#[ ]+`)
+	// Matches a valid @example continuation line: any comment with >= 1 space or tab after #.
+	bpExampleContRe = regexp.MustCompile(`^[\s]*#[ \t]+`)
 
 	// Trims leading/trailing empty lines from a description.
 	bpCleanLeadingRe  = regexp.MustCompile(`^[\s\n]*\n`)
@@ -260,8 +260,7 @@ func collectContinuation(lines []LexedLine, start int, tagAbsCol int, tagHashCol
 }
 
 // collectExampleLines collects @example continuation lines. A line continues
-// the example if it has at least one space after the # character, matching the
-// original awk/Go behaviour: /^[[:space:]]*#[ ]+/.
+// the example if it has at least one space or tab after the # character.
 func collectExampleLines(lines []LexedLine, start int) ([]LexedLine, int) {
 	i := start
 	for i < len(lines) && bpExampleContRe.MatchString(lines[i].Raw) {
