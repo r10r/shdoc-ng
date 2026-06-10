@@ -4,6 +4,37 @@ import (
 	"strings"
 )
 
+// trimExampleLeadingTabs removes up to count leading tabs from each line that
+// begins with a tab, but only if the first line of the example begins with at
+// least count tabs. Lines that begin with any other character are left as-is.
+func trimExampleLeadingTabs(text string, count int) string {
+	if count <= 0 || text == "" {
+		return text
+	}
+
+	first := text
+	if i := strings.IndexByte(text, '\n'); i >= 0 {
+		first = text[:i]
+	}
+	if !strings.HasPrefix(first, strings.Repeat("\t", count)) {
+		return text
+	}
+
+	lines := strings.Split(text, "\n")
+	for i, line := range lines {
+		if line == "" || line[0] != '\t' {
+			continue
+		}
+		trimmed := 0
+		for trimmed < count && trimmed < len(line) && line[trimmed] == '\t' {
+			trimmed++
+		}
+		lines[i] = line[trimmed:]
+	}
+
+	return strings.Join(lines, "\n")
+}
+
 // unindent removes common leading whitespace from text lines.
 // Matches the awk implementation precisely.
 func unindent(text string) string {
@@ -53,3 +84,6 @@ func unindent(text string) string {
 	return result.String()
 }
 
+func formatExample(text string, trimTabs int) string {
+	return unindent(trimExampleLeadingTabs(text, trimTabs))
+}

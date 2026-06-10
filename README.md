@@ -131,6 +131,8 @@ Flags:
       --include-undocumented List functions with no documentation alongside documented ones
       --include-internal     Surface @internal functions (marked as internal in the output)
       --include-all          Shorthand for --include-undocumented --include-internal
+      --example-trim-tabs int
+                             Trim up to this many leading tabs from example lines that start with a tab; 0 disables trimming (default 2)
 ```
 
 ### check

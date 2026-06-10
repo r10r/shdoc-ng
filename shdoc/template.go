@@ -1,8 +1,8 @@
 package shdoc
 
 import (
-	_ "embed"
 	"bytes"
+	_ "embed"
 	"fmt"
 	"strings"
 	"text/template"
@@ -20,6 +20,14 @@ var DefaultMarkdownTemplate string
 
 //go:embed templates/html.tmpl
 var DefaultHTMLTemplate string
+
+// RenderOptions controls optional rendering behavior.
+type RenderOptions struct {
+	// ExampleTrimTabs removes up to this many leading tabs from each example
+	// line whose first character is a tab before formatting it for output.
+	// A value of 0 disables trimming.
+	ExampleTrimTabs int
+}
 
 // optionFormStr reconstructs the raw display string for one OptionForm.
 // e.g. OptionForm{Name: "--file", Value: "path", ValueSep: " "} → "--file <path>"
@@ -163,26 +171,38 @@ func chromaThemeCSS() string {
 
 // funcMap is the template function map used for rendering.
 var funcMap = template.FuncMap{
-	"slug":          slug,
-	"unindent":     unindent,
-	"optionFormStr": optionFormStr,
-	"mdEscape":     mdEscape,
-	"mdBold":       mdBold,
-	"mdLink":       mdLink,
-	"mdAnchor":     mdAnchor,
-	"mdLinkify":    mdLinkify,
-	"renderSeeRef": renderSeeRef,
-	"trimSpace":    strings.TrimSpace,
-	"replaceAll":   strings.ReplaceAll,
-	"md2html":       md2html,
-	"md2inline":     md2inline,
+	"slug":           slug,
+	"unindent":       unindent,
+	"optionFormStr":  optionFormStr,
+	"mdEscape":       mdEscape,
+	"mdBold":         mdBold,
+	"mdLink":         mdLink,
+	"mdAnchor":       mdAnchor,
+	"mdLinkify":      mdLinkify,
+	"renderSeeRef":   renderSeeRef,
+	"trimSpace":      strings.TrimSpace,
+	"replaceAll":     strings.ReplaceAll,
+	"md2html":        md2html,
+	"md2inline":      md2inline,
 	"highlightCode":  highlightCode,
 	"chromaThemeCSS": chromaThemeCSS,
 }
 
 // renderWithTemplate renders a Document using the given template text.
 func RenderWithTemplate(doc *Document, tmplText string) (string, error) {
-	tmpl, err := template.New("doc").Funcs(funcMap).Parse(tmplText)
+	return RenderWithTemplateOptions(doc, tmplText, RenderOptions{})
+}
+
+// RenderWithTemplateOptions renders a Document using the given template text
+// and rendering options.
+func RenderWithTemplateOptions(doc *Document, tmplText string, opts RenderOptions) (string, error) {
+	fm := make(template.FuncMap, len(funcMap)+1)
+	for k, v := range funcMap {
+		fm[k] = v
+	}
+	fm["formatExample"] = func(text string) string { return formatExample(text, opts.ExampleTrimTabs) }
+
+	tmpl, err := template.New("doc").Funcs(fm).Parse(tmplText)
 	if err != nil {
 		return "", err
 	}

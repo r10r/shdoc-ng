@@ -18,6 +18,7 @@ var (
 	genIncludeUndocumented bool
 	genIncludeInternal     bool
 	genIncludeAll          bool
+	genExampleTrimTabs     int
 )
 
 var defaultTemplates = map[string]string{
@@ -47,10 +48,15 @@ func init() {
 	generateCmd.Flags().BoolVar(&genIncludeUndocumented, "include-undocumented", false, "List functions with no documentation alongside documented ones")
 	generateCmd.Flags().BoolVar(&genIncludeInternal, "include-internal", false, "Surface @internal functions, marked as internal")
 	generateCmd.Flags().BoolVar(&genIncludeAll, "include-all", false, "Shorthand for --include-undocumented --include-internal")
+	generateCmd.Flags().IntVar(&genExampleTrimTabs, "example-trim-tabs", 2, "Trim up to this many leading tabs from example lines that start with a tab; 0 disables trimming")
 	rootCmd.AddCommand(generateCmd)
 }
 
 func runGenerate(cmd *cobra.Command, args []string) (retErr error) {
+	if genExampleTrimTabs < 0 {
+		return fmt.Errorf("invalid --example-trim-tabs value %d: must be >= 0", genExampleTrimTabs)
+	}
+
 	var output io.Writer
 	if genOutputFile == "-" {
 		output = os.Stdout
@@ -109,7 +115,9 @@ func runGenerate(cmd *cobra.Command, args []string) (retErr error) {
 			tmplText = string(data)
 		}
 		var err error
-		out, err = shdoc.RenderWithTemplate(&doc, tmplText)
+		out, err = shdoc.RenderWithTemplateOptions(&doc, tmplText, shdoc.RenderOptions{
+			ExampleTrimTabs: genExampleTrimTabs,
+		})
 		if err != nil {
 			return fmt.Errorf("rendering %s: %w", genFormat, err)
 		}
